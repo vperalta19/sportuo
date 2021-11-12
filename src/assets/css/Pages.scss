@@ -1,0 +1,177 @@
+.container{
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    .header-page{
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 10px;
+        width: 96%;
+        .searcher-container{
+            background-color: #E8E8E8;
+            
+            display: flex;
+            padding: 5px;
+            // border-radius: 10px;
+            .searcher{
+                border: none;
+                background-color: #E8E8E8;
+                outline: none;
+                height: auto;
+                width: 300px;
+            }
+            .button-icon{
+                font-size: 20px;
+            }
+        }
+        .create-container{
+            width: 100%;
+            
+            .alta{
+                float: right;
+                width: 250px;
+                justify-content: center;
+                background: #4FA800;
+                // border-radius: 25px;
+                color: #FFFFFF;
+                font-style: normal;
+                font-weight: 500;
+                font-size: 15px;
+                line-height: 24px;
+                margin-right: 5px;
+                
+                cursor: pointer;
+                border: 2px solid #FFFFFF;
+                align-items: center;
+                display: flex;
+                flex-direction: row;
+                padding: 2px 20px;
+                &:hover{
+                    background-color: white;
+                    border: 2px solid #4FA800;
+                    color: #4FA800;
+                }
+            }
+
+            .liquidar{
+                float: right;
+                width: 150px;
+                justify-content: center;
+                background: #000000;
+                // border-radius: 25px;
+                color: #FFFFFF;
+                font-style: normal;
+                font-weight: 500;
+                font-size: 15px;
+                line-height: 24px;
+                margin-right: 5px;
+                
+                cursor: pointer;
+                border: 2px solid #FFFFFF;
+                align-items: center;
+                display: flex;
+                flex-direction: row;
+                padding: 2px 20px;
+                &:hover{
+                    background-color: white;
+                    border: 2px solid #000000;
+                    color: #000000;
+                }
+            }
+            
+    
+        }
+    }
+    
+    .content-items{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        .not-found{
+            display: flex;
+            height: 100%;
+            flex-direction: column;
+            overflow: hidden;
+            margin: 50px;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            img{
+                width: 50px;
+                height: 50px;
+            }
+            span{
+                font-family: 'Source Sans Pro';
+                font-size: 15px;
+                margin-top: 10px;
+                font-style: normal;
+                line-height: 14px;
+                &.titulo-not-found{
+                    font-weight: normal;
+                    text-align: center;
+                    color: #8A8A8A;
+                    
+                }
+            }
+        }
+        .item-container{
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-bottom: 25px;
+            .item-content-container {
+                width: 100%;
+                display: flex;
+                flex-direction: row;
+                font-size: 15px;
+                padding: 10px 0;
+                flex-wrap: wrap;
+                .info {
+                    display: flex;
+                    flex-direction: column;
+                    flex: 1;
+                    margin-right: 25px;
+                    &.small {
+                        flex: 1;
+                    }
+                    &.big {
+                        flex: 2;
+                    }
+                    .property {
+                        flex: 1;
+                        display: inline-flex;
+                        
+                        width: 100%;
+            
+                        .property-title {
+                            flex-shrink: 0;
+                            text-align: right;
+                            line-height: 25px;
+            
+                            width: 175px;
+                            background-color: #FFFFFF80;
+                            padding-right: 5px;
+            
+                            font-weight: bolder;
+                        }
+            
+                        .property-value {
+                            line-height: 20px;
+                            text-align: justify;
+                            // max-width: 600px;
+                            padding: 2px 10px 0 25px;
+                        }
+                    }
+                }
+            }
+        }
+        
+    }
+    
+
+}
+
+
