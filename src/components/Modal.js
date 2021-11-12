@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {Dialog,DialogTitle,DialogContent,DialogActions} from '@material-ui/core';
+import {Dialog,DialogTitle,DialogContent,DialogActions} from '@mui/material';
 import '../assets/css/Modal.css'
 
 export default class Modal extends Component {
