@@ -74,7 +74,7 @@ export default class Abonos extends Component {
         })
 		const response = await endpointCall("finance/get-subscriptions");
         const abonos  = await (await response.json()).data;
-		if (response.status != 200) {
+		if (response.status !== 200) {
 			return;
 		}
         this.setState({

@@ -48,7 +48,7 @@ export default class InputsItemContent extends Component {
 									}
 								}
 								onChange={(item)=>{this.props.handleChange(input.propertyId, item.value)}}
-								value={input.list.find((item) => { return item.value == this.state.values[input.propertyId]; })}
+								value={input.list.find((item) => { return item.value === this.state.values[input.propertyId]; })}
 							/>
 							: (
 							input.date ?
@@ -86,7 +86,7 @@ export default class InputsItemContent extends Component {
 			if (property.nonEmpty === true)
 			{
 				const value = this.props.values[property.propertyId];
-				if (value == null || value.length === 0)
+				if (value === null || value.length === 0)
 				{
 					this.setState({
 						error: (typeof property.errorMsg === 'undefined') ? "Error" : property.errorMsg

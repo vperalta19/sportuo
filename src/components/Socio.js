@@ -316,7 +316,7 @@ export default class Socio extends Component {
 				<div className='info small'>
 					<div className='property'>
 						<div className='property-title'>Apto medico:</div>
-						<div className='property-value'>{this.socio.medicalDischarge == 1 ? "Si" : "No" }</div>
+						<div className='property-value'>{this.socio.medicalDischarge === 1 ? "Si" : "No" }</div>
 					</div>
 					<div className='property'>
 						<div className='property-title'>Dirección:</div>
