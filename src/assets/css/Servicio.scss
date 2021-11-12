@@ -1,0 +1,16 @@
+.dates-list {
+	display: inherit;
+
+	.date-container {
+		width: 40px;
+		text-align: center;
+
+		.date {
+			font-weight: bold;
+		}
+		
+		.time {
+			font-style: italic;
+		}
+	}
+}

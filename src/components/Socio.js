@@ -134,10 +134,7 @@ export default class Socio extends Component {
 				response = await endpointCall("finance/set-subscription", {
 					dni: this.socio.dni,
 					subscriptionID: this.state.adherirSocio.subscriptionID,
-					tipo: '0 o 1',
-					numeroTarjeta: this.state.adherirSocio.numeroTarjeta,
-					codSeg: this.state.adherirSocio.codSeg,
-					fechaVencimiento: this.state.adherirSocio.fechaVencimiento,
+					metodoPago: this.state.adherirSocio.metodoPago
 				}, 'POST');
 			}
 			else if(this.state.adherirOption === 'servicio'){

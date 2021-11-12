@@ -1,0 +1,17 @@
+.dates-list {
+  display: inherit;
+}
+
+.dates-list .date-container {
+  width: 40px;
+  text-align: center;
+}
+
+.dates-list .date-container .date {
+  font-weight: bold;
+}
+
+.dates-list .date-container .time {
+  font-style: italic;
+}
+/*# sourceMappingURL=Servicio.css.map */
