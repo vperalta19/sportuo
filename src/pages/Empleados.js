@@ -17,7 +17,9 @@ export default class Empleados extends Component {
 			modalTitle: 'Agregar nuevo empleado',
 			modalContent: '',
 			values: {},
-			loading: false
+			loading: false,
+			liquidarModalContent: '',
+			liquidarModalIsOpen: false
 		}
 		this.modalForm = React.createRef();
 	}
@@ -94,6 +96,12 @@ export default class Empleados extends Component {
                             propertyName: 'Dirección',
 							nonEmpty: true,
 							errorMsg: "Ingrese una dirección"
+                        },
+						{
+                            propertyId: 'cbu',
+                            propertyName: 'CBU',
+							nonEmpty: true,
+							errorMsg: "Ingrese un cbu"
                         }
                     ]}
                     handleChange={(name, value)=>{this.handleChange(name, value)}}
@@ -142,7 +150,8 @@ export default class Empleados extends Component {
 
 	onCancel(){
 		this.setState({
-			modalIsOpen: false
+			modalIsOpen: false,
+			liquidarModalIsOpen: false
 		})
 	}
 
@@ -156,8 +165,17 @@ export default class Empleados extends Component {
 		})
 	}
 
-	liquidarSueldo(){
-
+	async liquidarSueldo(){
+		console.error('hola')
+		this.setState({
+			liquidarModalIsOpen: true,
+			liquidarModalContent: <CircularProgress color="success"/> 
+		})
+		const response = await endpointCall("finance/pay-salary", {fechaFin: new Date()},'POST');
+		this.setState({
+			liquidarModalIsOpen: true,
+			liquidarModalContent: (await response.json()).message
+		})
 	}
 
 	getLiquidarSueldo(){
@@ -176,6 +194,14 @@ export default class Empleados extends Component {
 					onAccept={()=>{this.onAccept()}}
 					onCancel={()=>{this.onCancel()}}
 					cancel={true}
+				></Modal>
+				<Modal 
+					content={this.state.liquidarModalContent} 
+					isOpen={this.state.liquidarModalIsOpen}
+					title="Liquidación de sueldos"
+					acceptLabel="Aceptar"
+					onAccept={()=>{this.onCancel()}}
+					cancel={false}
 				></Modal>
 				<PageContainer 
 					content={

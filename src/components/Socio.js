@@ -34,7 +34,9 @@ export default class Socio extends Component {
 			adherirSocio: Object.assign({}, props.socio),
 			onAccept: ()=>{return},
 			onCancel: ()=>{this.onCancel()},
-			adherirOption: 'abono'
+			adherirOption: 'abono',
+			errorInputs: false,
+			errorInputText: ''
 		}
 		//estos dos ultimos tendrian que darse funcionalidad en los setModal
 		this.modalForm = React.createRef();
@@ -131,11 +133,24 @@ export default class Socio extends Component {
 		{
 			let response;
 			if(this.state.adherirOption === 'abono'){
-				response = await endpointCall("finance/set-subscription", {
-					dni: this.socio.dni,
-					subscriptionID: this.state.adherirSocio.subscriptionID,
-					metodoPago: this.state.adherirSocio.metodoPago
-				}, 'POST');
+				if(this.state.adherirSocio.tipo === 1){
+					response = await endpointCall("finance/set-subscription", {
+						dni: this.socio.dni,
+						subscriptionID: this.state.adherirSocio.subscriptionID,
+						tipo: this.state.adherirSocio.tipo,
+						numeroTarjeta: this.state.adherirSocio.numeroTarjeta,
+						codSeg: this.state.adherirSocio.codSeg,
+						fechaVencimiento: this.state.adherirSocio.fechaVencimiento,
+					}, 'POST');
+				}
+				else{
+					response = await endpointCall("finance/set-subscription", {
+						dni: this.socio.dni,
+						subscriptionID: this.state.adherirSocio.subscriptionID,
+						tipo: this.state.adherirSocio.tipo
+					}, 'POST');
+				}
+				
 			}
 			else if(this.state.adherirOption === 'servicio'){
 				response = await endpointCall("appointment/set", {
@@ -148,6 +163,14 @@ export default class Socio extends Component {
 					modalIsOpen: false
 				})
 				setTimeout(() => {this.props.fetchData()}, 100)
+			}
+			else{
+				const json = await response.json();
+				this.setState({
+					errorInputs: true,
+					errorInputText: json.message
+				})
+				this.reloadInputs()
 			}
 			
 		}
@@ -170,13 +193,19 @@ export default class Socio extends Component {
 		await this.setState({
 			adherirOption: content,
 		})
+		this.reloadInputs()
+	}
+
+	async reloadInputs(){
 		this.setState({
 			modalContent: await this.getModalAltaContent(),
 		})
 	}
 
+	
+
 	async getModalAltaContent(){
-		return 	<div>
+		return 	<div className='adherir-socio-modal'>
 					<div className='adherir-socio-container'>
 						<div className={(this.state.adherirOption === 'abono') ? 'adherir-socio selected' : 'adherir-socio'} 
 							onClick={()=>{this.changeAdherirSocioContainer('abono')}}>Adherir a abono</div>
@@ -184,6 +213,7 @@ export default class Socio extends Component {
 							onClick={()=>{this.changeAdherirSocioContainer('servicio')}}>Adherir a servicio</div>
 					</div>
 					{(this.state.adherirOption === 'abono') ? 
+					(this.state.adherirSocio.tipo === 1) ?
 					<InputsItemContent
 						ref={this.modalForm}
 						indications='Seleccionar tipo de abono y metodo en el que se pago'
@@ -202,7 +232,7 @@ export default class Socio extends Component {
 								})
 							},
 							{
-								propertyId: 'metodoPago',
+								propertyId: 'tipo',
 								propertyName: 'Metodo Pago',
 								nonEmpty: true,
 								errorMsg: "Seleccione un metodo de pago",
@@ -218,8 +248,69 @@ export default class Socio extends Component {
 									}
 								]
 							},
+							{
+								propertyId: 'numeroTarjeta',
+								propertyName: 'Numero de Tarjeta',
+								nonEmpty: true,
+								errorMsg: "Ingrese el numero de Tarjeta"
+							},
+							{
+								propertyId: 'codSeg',
+								propertyName: 'Codigo de seguridad',
+								nonEmpty: true,
+								errorMsg: "Ingrese el codigo de seguridad"
+							},
+							{
+								propertyId: 'fechaVencimiento',
+								propertyName: 'Fecha de vencimiento (Ej: 2023-04)',
+								nonEmpty: true,
+								errorMsg: "Ingrese la fehca de vencimiento"
+							},
+
 						]}
-						handleChange={(name, value)=>{this.handleChange(name, value)}}
+						handleChange={(name, value)=>{this.handleChange(name, value);this.reloadInputs()}}
+						values={this.state.adherirSocio}
+					>
+					</InputsItemContent>
+					:
+					<InputsItemContent
+						ref={this.modalForm}
+						indications='Seleccionar tipo de abono y metodo en el que se pago'
+						properties={[
+							{
+								propertyId: 'subscriptionID',
+								propertyName: 'Tipo',
+								nonEmpty: true,
+								errorMsg: "Seleccione un abono",
+								select: true,
+								list: await this.abonos.map((a)=>{
+									return {
+										value: a.id,
+										label: a.type
+									}
+								})
+							},
+							{
+								propertyId: 'tipo',
+								propertyName: 'Metodo Pago',
+								nonEmpty: true,
+								errorMsg: "Seleccione un metodo de pago",
+								select: true,
+								list: [
+									{
+										value: 0,
+										label: 'Efectivo'
+									},
+									{
+										value: 1,
+										label: 'Tarjeta'
+									}
+								]
+							},
+							
+
+						]}
+						handleChange={(name, value)=>{this.handleChange(name, value);this.reloadInputs()}}
 						values={this.state.adherirSocio}
 					>
 					</InputsItemContent>
@@ -246,6 +337,7 @@ export default class Socio extends Component {
 						values={this.state.adherirSocio}
 					>
 					</InputsItemContent>}
+					{(this.state.errorInputs) ? <div style={{color:"red"}}>{this.state.errorInputText}</div> : ''}
 				</div>
 	}
 

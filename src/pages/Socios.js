@@ -23,6 +23,8 @@ export default class Socios extends Component {
 			modalState: 'signUp',
 			adherirSocio:{},
 			loading: false,
+			errorInputs: false,
+			errorInputsText: ''
 		}
 		this.modalForm = React.createRef()
 	}
@@ -45,10 +47,17 @@ export default class Socios extends Component {
 		this.modalForm.current.updateValues(adherirSocio);
     }
 
+	async reloadInputs(){
+		this.setState({
+			modalContent: await this.getCreateItemModalContent(),
+		})
+	}
+
+
 	async getCreateItemModalContent(){
 		const response = await endpointCall("finance/get-subscriptions");
         const abonos  = await (await response.json()).data;
-		return ((this.state.modalState === 'signUp') ? <InputsItemContent
+		return (<div>{(this.state.modalState === 'signUp') ? <InputsItemContent
 					ref={this.modalForm}
 					indications='Cargar los siguientes datos para crear un nuevo socio'
 					properties={[
@@ -101,45 +110,109 @@ export default class Socios extends Component {
 				>
 				</InputsItemContent>
 				:
-				<InputsItemContent
-					ref={this.modalForm}
-					indications='Seleccionar tipo de abono y metodo en el que se pago'
-					properties={[
-						{
-							propertyId: 'subscriptionID',
-							propertyName: 'Tipo',
-							nonEmpty: true,
-							errorMsg: "Seleccione un abono",
-							select: true,
-							list: await abonos.map((a)=>{
-								return {
-									value: a.id,
-									label: a.type
-								}
-							})
-						},
-						{
-							propertyId: 'metodoPago',
-							propertyName: 'Metodo Pago',
-							nonEmpty: true,
-							errorMsg: "Seleccione un metodo de pago",
-							select: true,
-							list: [
-								{
-									value: 0,
-									label: 'Efectivo'
-								},
-								{
-									value: 1,
-									label: 'Tarjeta'
-								}
-							]
-						},
-					]}
-					handleChange={(name, value)=>{this.handleChangeAdherir(name, value)}}
-					values={this.state.adherirSocio}
-				>
-				</InputsItemContent>
+				(this.state.adherirSocio.tipo === 1) ?
+					<InputsItemContent
+						ref={this.modalForm}
+						indications='Seleccionar tipo de abono y metodo en el que se pago'
+						properties={[
+							{
+								propertyId: 'subscriptionID',
+								propertyName: 'Tipo',
+								nonEmpty: true,
+								errorMsg: "Seleccione un abono",
+								select: true,
+								list: await abonos.map((a)=>{
+									return {
+										value: a.id,
+										label: a.type
+									}
+								})
+							},
+							{
+								propertyId: 'tipo',
+								propertyName: 'Metodo Pago',
+								nonEmpty: true,
+								errorMsg: "Seleccione un metodo de pago",
+								select: true,
+								list: [
+									{
+										value: 0,
+										label: 'Efectivo'
+									},
+									{
+										value: 1,
+										label: 'Tarjeta'
+									}
+								]
+							},
+							{
+								propertyId: 'numeroTarjeta',
+								propertyName: 'Numero de Tarjeta',
+								nonEmpty: true,
+								errorMsg: "Ingrese el numero de Tarjeta"
+							},
+							{
+								propertyId: 'codSeg',
+								propertyName: 'Codigo de seguridad',
+								nonEmpty: true,
+								errorMsg: "Ingrese el codigo de seguridad"
+							},
+							{
+								propertyId: 'fechaVencimiento',
+								propertyName: 'Fecha de vencimiento (Ej: 2023-04)',
+								nonEmpty: true,
+								errorMsg: "Ingrese la fehca de vencimiento"
+							},
+
+						]}
+						handleChange={(name, value)=>{this.handleChange(name, value);this.reloadInputs()}}
+						values={this.state.adherirSocio}
+					>
+					</InputsItemContent>
+					:
+					<InputsItemContent
+						ref={this.modalForm}
+						indications='Seleccionar tipo de abono y metodo en el que se pago'
+						properties={[
+							{
+								propertyId: 'subscriptionID',
+								propertyName: 'Tipo',
+								nonEmpty: true,
+								errorMsg: "Seleccione un abono",
+								select: true,
+								list: await abonos.map((a)=>{
+									return {
+										value: a.id,
+										label: a.type
+									}
+								})
+							},
+							{
+								propertyId: 'tipo',
+								propertyName: 'Metodo Pago',
+								nonEmpty: true,
+								errorMsg: "Seleccione un metodo de pago",
+								select: true,
+								list: [
+									{
+										value: 0,
+										label: 'Efectivo'
+									},
+									{
+										value: 1,
+										label: 'Tarjeta'
+									}
+								]
+							},
+							
+
+						]}
+						handleChange={(name, value)=>{this.handleChange(name, value);this.reloadInputs()}}
+						values={this.state.adherirSocio}
+					>
+					</InputsItemContent>}
+					{(this.state.errorInputs) ? <div style={{color:"red"}}>{this.state.errorInputText}</div> : ''}
+					</div>
 				)
 	}
 	
@@ -195,13 +268,27 @@ export default class Socios extends Component {
 				response = await endpointCall("finance/set-subscription", {
 					dni: this.dniNewSocio,
 					subscriptionID: this.state.adherirSocio.subscriptionID,
-					metodoPago: this.state.adherirSocio.metodoPago
+					tipo: this.state.adherirSocio.tipo,
+					numeroTarjeta: this.state.adherirSocio.numeroTarjeta,
+					codSeg: this.state.adherirSocio.codSeg,
+					fechaVencimiento: this.state.adherirSocio.fechaVencimiento,
 				}, 'POST');
-				this.setState({
-					modalState: 'signUp',
-					modalIsOpen: false
-				})
-				this.fetchData()
+				if ((await response).ok) {
+					this.setState({
+						modalState: 'signUp',
+						modalIsOpen: false
+					});
+					setTimeout(() => {this.fetchData()}, 100)
+				}
+				else{
+					const json = await response.json()
+					this.setState({
+						errorInputs: true,
+						errorInputText: json.message
+					})
+					this.reloadInputs()
+				}
+				
 			}
 			
 		}
