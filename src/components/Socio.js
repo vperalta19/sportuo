@@ -134,6 +134,14 @@ export default class Socio extends Component {
 			let response;
 			if(this.state.adherirOption === 'abono'){
 				if(this.state.adherirSocio.tipo === 1){
+					console.error({
+						dni: this.socio.dni,
+						subscriptionID: this.state.adherirSocio.subscriptionID,
+						tipo: this.state.adherirSocio.tipo,
+						numeroTarjeta: parseInt(this.state.adherirSocio.numeroTarjeta),
+						codSeg: parseInt(this.state.adherirSocio.codSeg),
+						fechaVencimiento: this.state.adherirSocio.fechaVencimiento,
+					})
 					response = await endpointCall("finance/set-subscription", {
 						dni: this.socio.dni,
 						subscriptionID: this.state.adherirSocio.subscriptionID,
