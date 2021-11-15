@@ -171,18 +171,8 @@ export default class Empleado extends Component {
 						<div className='property-value'>{this.empleado.birthday}</div>
 					</div>
 					<div className='property'>
-						<div className='property-title'>Salario por hora:</div>
-						<div className='property-value'>{this.empleado.salaryPerHour}</div>
-					</div>
-					<div className='property'>
 						<div className='property-title'>Dirección:</div>
 						<div className='property-value'>{this.empleado.address}</div>
-					</div>
-				</div>
-				<div className='info small'>
-					<div className='property'>
-						<div className='property-title'>Horas trabajadas:</div>
-						<div className='property-value'>{this.empleado.hoursWorked}</div>
 					</div>
 				</div>
 			</div>
