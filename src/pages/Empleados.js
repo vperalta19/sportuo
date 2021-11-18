@@ -166,7 +166,6 @@ export default class Empleados extends Component {
 	}
 
 	async liquidarSueldo(){
-		console.error('hola')
 		this.setState({
 			liquidarModalIsOpen: true,
 			liquidarModalContent: <CircularProgress color="success"/> 

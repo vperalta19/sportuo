@@ -24,7 +24,8 @@ export default class Socios extends Component {
 			adherirSocio:{},
 			loading: false,
 			errorInputs: false,
-			errorInputsText: ''
+			errorInputsText: '',
+			onAccept: ()=>this.onAccept()
 		}
 		this.modalForm = React.createRef()
 	}
@@ -50,6 +51,7 @@ export default class Socios extends Component {
 	async reloadInputs(){
 		this.setState({
 			modalContent: await this.getCreateItemModalContent(),
+			onAccept: ()=>this.onAccept()
 		})
 	}
 
@@ -165,7 +167,7 @@ export default class Socios extends Component {
 							},
 
 						]}
-						handleChange={(name, value)=>{this.handleChange(name, value);this.reloadInputs()}}
+						handleChange={(name, value)=>{this.handleChangeAdherir(name, value);this.reloadInputs()}}
 						values={this.state.adherirSocio}
 					>
 					</InputsItemContent>
@@ -207,7 +209,7 @@ export default class Socios extends Component {
 							
 
 						]}
-						handleChange={(name, value)=>{this.handleChange(name, value);this.reloadInputs()}}
+						handleChange={(name, value)=>{this.handleChangeAdherir(name, value);this.reloadInputs()}}
 						values={this.state.adherirSocio}
 					>
 					</InputsItemContent>}
@@ -232,15 +234,32 @@ export default class Socios extends Component {
 			items: socios,
 			itemsBackup: socios,
 			modalContent: await this.getCreateItemModalContent(),
+			onAccept: ()=>this.onAccept(),
 			loading: false
 		})
 
 	}
 
 	onAltaSectionClick(){
+		this.reloadInputs()
 		this.setState({
 			modalIsOpen: true
 		})
+	}
+
+	getModalFactura(response){
+		return (<div>
+					<div>Monto: ${response.monto} </div> 
+					<div>Suscripción: Abono {response.abono} </div>
+					{(this.state.adherirSocio.tipo === 0) ? 
+					<div>Metodo de pago: Efectivo</div> 
+					: 
+					<div>
+						<div>Metodo de pago: Tarjeta</div> 
+						<div>Tarjeta finalizada en: {this.state.adherirSocio.numeroTarjeta.substr(this.state.adherirSocio.numeroTarjeta.length - 4)}</div> 
+					</div> 
+					}
+				</div>)
 	}
 
 	async onAccept(){
@@ -250,7 +269,8 @@ export default class Socios extends Component {
 			if(this.state.modalState === 'signUp'){
 
 				response = await endpointCall("user/sign-up", this.state.values,'POST');
-				const socioResponse  = await (await response.json()).data;
+				const json  = await response.json();
+				const socioResponse  = json.data;
 				if ((await response).ok) {
 					await endpointCall("user/set-health-record", {
 						userID: socioResponse.id,
@@ -259,29 +279,47 @@ export default class Socios extends Component {
 					},'POST');
 					this.dniNewSocio = this.state.values.dni
 					this.setState({
-						modalState: 'abono'
+						modalState: 'abono',
+						errorInputs: false,
 					})
 					this.fetchData()
 				}
+				else{
+					this.setState({
+						errorInputs: true,
+						errorInputText: json.message
+					})
+					this.reloadInputs()
+				}
 			}
 			else if(this.state.modalState === 'abono'){
-				response = await endpointCall("finance/set-subscription", {
-					dni: this.dniNewSocio,
-					subscriptionID: this.state.adherirSocio.subscriptionID,
-					tipo: this.state.adherirSocio.tipo,
-					numeroTarjeta: this.state.adherirSocio.numeroTarjeta,
-					codSeg: this.state.adherirSocio.codSeg,
-					fechaVencimiento: this.state.adherirSocio.fechaVencimiento,
-				}, 'POST');
-				if ((await response).ok) {
-					this.setState({
-						modalState: 'signUp',
-						modalIsOpen: false
-					});
-					setTimeout(() => {this.fetchData()}, 100)
+				if(this.state.adherirSocio.tipo === 1){
+					response = await endpointCall("finance/set-subscription", {
+						dni: this.state.values.dni,
+						subscriptionID: this.state.adherirSocio.subscriptionID,
+						tipo: this.state.adherirSocio.tipo,
+						numeroTarjeta: this.state.adherirSocio.numeroTarjeta,
+						codSeg: this.state.adherirSocio.codSeg,
+						fechaVencimiento: this.state.adherirSocio.fechaVencimiento,
+					}, 'POST');
 				}
 				else{
-					const json = await response.json()
+					response = await endpointCall("finance/set-subscription", {
+						dni: this.state.values.dni,
+						subscriptionID: this.state.adherirSocio.subscriptionID,
+						tipo: this.state.adherirSocio.tipo,
+					}, 'POST');
+				}
+				if ((await response).ok) {
+					this.setState({
+						modalContent: this.getModalFactura(await response.json()),
+						modalTitle: 'Factura',
+						onAccept: ()=>{this.fetchData();this.onCancel();},
+						cancel: false
+					})
+				}
+				else{
+					const json = await response.json();
 					this.setState({
 						errorInputs: true,
 						errorInputText: json.message
@@ -317,7 +355,7 @@ export default class Socios extends Component {
 					content={this.state.modalContent} 
 					isOpen={this.state.modalIsOpen}
 					title={this.state.modalTitle}
-					onAccept={()=>{this.onAccept()}}
+					onAccept={()=>{this.state.onAccept()}}
 					onCancel={()=>{this.onCancel()}}
 					cancel={this.state.modalState !== 'abono'}
 				></Modal>
