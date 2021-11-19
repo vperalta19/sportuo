@@ -155,8 +155,10 @@ export default class Empleados extends Component {
 		})
 	}
 
-	onSearchChange(searchValue){
-		
+	async onSearchChange(searchValue){
+		await this.setState({
+			items: []
+		})
 		const listToFilter = Array.from(this.state.itemsBackup);
 		const listFiltered = listToFilter.filter((element) => element.name.toUpperCase().includes(searchValue.toUpperCase()) || element.surname.toUpperCase().includes(searchValue.toUpperCase()));
 		

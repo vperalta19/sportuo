@@ -14,7 +14,7 @@ export default class Servicios extends Component {
 
 		this.state = {
 			items: [],
-			itemsBackUp: [],
+			itemsBackup: [],
 			modalIsOpen: false,
 			modalTitle: 'Agregar nuevo servicio',
 			modalContent: '',
@@ -122,9 +122,11 @@ export default class Servicios extends Component {
 		})
 	}
 
-	onSearchChange(searchValue){
-		
-		const listToFilter = Array.from(this.state.itemsBackUp);
+	async onSearchChange(searchValue){
+		await this.setState({
+			items: []
+		})
+		const listToFilter = Array.from(this.state.itemsBackup);
 		const listFiltered = listToFilter.filter((element) => element.name.toUpperCase().includes(searchValue.toUpperCase()));
 		
 		this.setState({
